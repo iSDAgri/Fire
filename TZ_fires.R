@@ -8,6 +8,7 @@
 require(downloader)
 require(rgdal)
 require(maptools)
+require(plyr)
 require(raster)
 
 #+ Data downloads ---------------------------------------------------------
@@ -33,7 +34,7 @@ grids <- stack(glist)
 
 #+ Data setup -------------------------------------------------------------
 # Variable subset selection
-fires <- fires[c(1,4:7,9:10)] ## variable (column) subset, drop unnecessary variables
+fires <- fires[c(1,4:7,9:10)] ## variable (column) subset ... drop unnecessary variables
 hc_fires <- fires[which(fires$conf > 80), ] ## high confidence (>80%) fire detection subset
 
 # ROI bounding box subset selection
@@ -53,4 +54,19 @@ gidx <- ifelse(bbx_fires$x<0, paste("W", xgid, sep=""), paste("E", xgid, sep="")
 gidy <- ifelse(bbx_fires$y<0, paste("S", ygid, sep=""), paste("N", ygid, sep=""))
 GID <- paste(gidx, gidy, sep="-")
 bbx_fires <- cbind(bbx_fires, GID)
+
+# Aggregate observations by GID's
+GID_fires <- ddply(bbx_fires, c("GID"), summarise,
+                   x = mean(x),
+                   y = mean(y),
+                   N = length(GID),
+                   minD = min(YYYYMMDD),
+                   maxD = max(YYYYMMDD),                                     
+                   FRP = mean(FRP))
+
+# Aggregate observations by date
+TID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
+                   YYYYMMDD = mean(YYYYMMDD),
+                   N = length(YYYYMMDD),
+                   FRP = mean(FRP))
 
