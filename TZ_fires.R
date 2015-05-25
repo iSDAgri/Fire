@@ -57,16 +57,16 @@ bbx_fires <- cbind(bbx_fires, GID)
 
 # Aggregate observations by GID's
 GID_fires <- ddply(bbx_fires, c("GID"), summarise,
-                   x = mean(x),
-                   y = mean(y),
+                   X = mean(x),
+                   Y = mean(y),
                    N = length(GID),
                    minD = min(YYYYMMDD),
                    maxD = max(YYYYMMDD),                                     
                    FRP = mean(FRP))
 
 # Aggregate observations by date
-TID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
-                   YYYYMMDD = mean(YYYYMMDD),
+DID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
+                   D = mean(YYYYMMDD),
                    N = length(YYYYMMDD),
                    FRP = mean(FRP))
 
