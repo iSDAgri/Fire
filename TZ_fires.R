@@ -21,13 +21,13 @@ download("https://www.dropbox.com/s/oi0nvimjawmz7xf/AF_MCD14ML.txt.zip?dl=0", ".
 unzip("./MCD14ML/AF_MCD14ML.txt.zip", exdir="./MCD14ML", overwrite=T)
 fires <- read.table(paste(dat_dir, "/AF_MCD14ML.txt", sep=""), header=T)
 
-# download country / ROI shape file
+# download ROI shape file
 download("https://www.dropbox.com/s/bb5277wvuce0b2h/TZ_bound.zip?dl=0", "./MCD14ML/TZ_bound.zip", mode="wb")
 unzip("./MCD14ML/TZ_bound.zip", exdir="./MCD14ML", overwrite=T)
 bound <- readShapeSpatial("./MCD14ML/TZ_bound.shp")
 
 # download GeoSurvey predictions and stack in raster
-download("https://www.dropbox.com/s/otiqe78s0kf1z1s/TZ_grids.zip?dl=0", "./MCD14ML/TZ_grids.zip", mode="wb")
+download("https://www.dropbox.com/s/0ucx0oqx8c4lpej/TZ_grids.zip?dl=0", "./MCD14ML/TZ_grids.zip", mode="wb")
 unzip("./MCD14ML/TZ_grids.zip", exdir="./MCD14ML", overwrite=T)
 glist <- list.files(path="./MCD14ML", pattern="tif", full.names=T)
 grids <- stack(glist)
