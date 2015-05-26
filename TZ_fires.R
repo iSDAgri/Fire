@@ -26,7 +26,7 @@ download("https://www.dropbox.com/s/bb5277wvuce0b2h/TZ_bound.zip?dl=0", "./MCD14
 unzip("./MCD14ML/TZ_bound.zip", exdir="./MCD14ML", overwrite=T)
 bound <- readShapeSpatial("./MCD14ML/TZ_bound.shp")
 
-# download GeoSurvey predictions and stack in raster
+# download ROI grids and stack in raster
 download("https://www.dropbox.com/s/0ucx0oqx8c4lpej/TZ_grids.zip?dl=0", "./MCD14ML/TZ_grids.zip", mode="wb")
 unzip("./MCD14ML/TZ_grids.zip", exdir="./MCD14ML", overwrite=T)
 glist <- list.files(path="./MCD14ML", pattern="tif", full.names=T)
@@ -61,11 +61,12 @@ DID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
                    N = length(YYYYMMDD),
                    FRP = mean(FRP))
 DID_fires$Date <- strptime(DID_fires$Date, "%Y%m%d")
-# time series plots
+
+# Bounding box time series plots
 plot(as.Date(DID_fires$Date), DID_fires$N, type="l", xlim=as.Date(c("2000-01-01","2015-01-01")), xlab="Date", ylab="Number of fires")
 plot(as.Date(DID_fires$Date), DID_fires$FRP, type="l", xlim=as.Date(c("2000-01-01","2015-01-01")), xlab="Date", ylab="Mean fire intensities")
 
-# Aggregate observations by GID's
+# Aggregate observations by AfSIS GID's
 GID_fires <- ddply(bbx_fires, c("GID"), summarise,
                    X = mean(x),
                    Y = mean(y),
@@ -75,5 +76,13 @@ GID_fires <- ddply(bbx_fires, c("GID"), summarise,
                    FRP = mean(FRP))
 GID_fires$minD <- strptime(GID_fires$minD, "%Y%m%d")
 GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d")
+
+# Extract gridded covariates at fire locations
+coordinates(GID_fires) = ~X+Y
+projection(GID_fires) <- projection(grids)
+fire_grid <- extract(grids, GID_fires)
+ROI_fires <- cbind(GID_fires, fire_grid)
+ROI_fires <- na.omit(ROI_fires)
+
 
 
