@@ -55,6 +55,16 @@ gidy <- ifelse(bbx_fires$y<0, paste("S", ygid, sep=""), paste("N", ygid, sep="")
 GID <- paste(gidx, gidy, sep="-")
 bbx_fires <- cbind(bbx_fires, GID)
 
+# Aggregate ROI-wide observations by date
+DID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
+                   Date = mean(YYYYMMDD),
+                   N = length(YYYYMMDD),
+                   FRP = mean(FRP))
+DID_fires$Date <- strptime(DID_fires$Date, "%Y%m%d")
+# time series plots
+plot(as.Date(DID_fires$Date), DID_fires$N, type="l", xlim=as.Date(c("2000-01-01","2015-01-01")), xlab="Date", ylab="Number of fires")
+plot(as.Date(DID_fires$Date), DID_fires$FRP, type="l", xlim=as.Date(c("2000-01-01","2015-01-01")), xlab="Date", ylab="Mean fire intensities")
+
 # Aggregate observations by GID's
 GID_fires <- ddply(bbx_fires, c("GID"), summarise,
                    X = mean(x),
@@ -63,10 +73,7 @@ GID_fires <- ddply(bbx_fires, c("GID"), summarise,
                    minD = min(YYYYMMDD),
                    maxD = max(YYYYMMDD),                                     
                    FRP = mean(FRP))
+GID_fires$minD <- strptime(GID_fires$minD, "%Y%m%d")
+GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d")
 
-# Aggregate observations by date
-DID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
-                   D = mean(YYYYMMDD),
-                   N = length(YYYYMMDD),
-                   FRP = mean(FRP))
 
