@@ -83,3 +83,7 @@ projection(GID_fires) <- projection(grids)
 xgrid <- extract(grids, GID_fires)
 ROI_fires <- cbind(GID_fires@coords, GID_fires@data, xgrid)
 ROI_fires <- na.omit(ROI_fires)
+
+# Export fire locations ---------------------------------------------------
+write.csv(ROI_fires[1:2], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
+
