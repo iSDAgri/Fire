@@ -1,7 +1,7 @@
 #' Analyses of ROI-level MODIS-MCD14ML fire data 
 #' Example ROI: Tanzania 
 #' Source data courtesy UMD (ftp://fuoco.geog.umd.edu/modis/C5/mcd14ml, login=fire, pwd=burnt)
-#' M. Walsh, May 2015
+#' M. Walsh & J. Chen, May 2015
 
 # Required packages
 # install.packages(c("downloader","rgdal","maptools","raster")), dependencies=TRUE)
@@ -68,8 +68,8 @@ plot(as.Date(DID_fires$Date), DID_fires$FRP, type="l", xlim=as.Date(c("2000-01-0
 
 # Aggregate observations by AfSIS GID's
 GID_fires <- ddply(bbx_fires, c("GID"), summarise,
-                   X = mean(x),
-                   Y = mean(y),
+                   x = mean(x),
+                   y = mean(y),
                    N = length(GID),
                    minD = min(YYYYMMDD),
                    maxD = max(YYYYMMDD),                                     
@@ -78,11 +78,8 @@ GID_fires$minD <- strptime(GID_fires$minD, "%Y%m%d")
 GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d")
 
 # Extract gridded covariates at fire locations
-coordinates(GID_fires) = ~X+Y
+coordinates(GID_fires) = ~x+y
 projection(GID_fires) <- projection(grids)
-fire_grid <- extract(grids, GID_fires)
-ROI_fires <- cbind(GID_fires, fire_grid)
+xgrid <- extract(grids, GID_fires)
+ROI_fires <- cbind(GID_fires@coords, GID_fires@data, xgrid)
 ROI_fires <- na.omit(ROI_fires)
-
-
-
