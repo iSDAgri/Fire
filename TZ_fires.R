@@ -46,7 +46,7 @@ bbx_proj <- as.data.frame(project(cbind(bbx_fires$lon, bbx_fires$lat), "+proj=la
 colnames(bbx_proj) <- c("x","y")
 bbx_fires <- cbind(bbx_fires, bbx_proj)
 
-# Generate AfSIS grid cell ID's (GID)
+# Generate AfSIS grid cell ID's (GID) & dates
 res.pixel <- 1000
 xgid <- ceiling(abs(bbx_fires$x)/res.pixel)
 ygid <- ceiling(abs(bbx_fires$y)/res.pixel)
@@ -55,27 +55,25 @@ gidy <- ifelse(bbx_fires$y<0, paste("S", ygid, sep=""), paste("N", ygid, sep="")
 GID <- paste(gidx, gidy, sep="-")
 bbx_fires <- cbind(bbx_fires, GID)
 
-# Aggregate ROI-wide observations by date
-DID_fires <- ddply(bbx_fires, c("YYYYMMDD"), summarise,
-                   Date = mean(YYYYMMDD),
+# Aggregate bounding box-wide observations by date
+DID_fires <- ddply(bbx_fires, .(YYYYMMDD), summarize,
                    N = length(YYYYMMDD),
                    FRP = mean(FRP))
-DID_fires$Date <- strptime(DID_fires$Date, "%Y%m%d")
+DID_fires$Date <- strptime(DID_fires$YYYYMMDD, "%Y%m%d")
 
 # Bounding box time series plots
 plot(as.Date(DID_fires$Date), DID_fires$N, type="l", xlim=as.Date(c("2000-01-01","2015-01-01")), xlab="Date", ylab="Number of fires")
 plot(as.Date(DID_fires$Date), DID_fires$FRP, type="l", xlim=as.Date(c("2000-01-01","2015-01-01")), xlab="Date", ylab="Mean fire intensities")
 
 # Aggregate observations by AfSIS GID's
-GID_fires <- ddply(bbx_fires, c("GID"), summarise,
+GID_fires <- ddply(bbx_fires, .(GID), summarize,
                    x = mean(x),
                    y = mean(y),
                    N = length(GID),
-                   minD = min(YYYYMMDD),
-                   maxD = max(YYYYMMDD),                                     
+                   maxD = max(YYYYMMDD),
                    FRP = mean(FRP))
-GID_fires$minD <- strptime(GID_fires$minD, "%Y%m%d")
-GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d")
+GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d") ## date of last fire
+GID_fires$DSLF <- as.numeric(difftime(max(GID_fires$maxD), GID_fires$maxD, units="days")) ## number of days since last fire
 
 # Extract gridded covariates at fire locations
 coordinates(GID_fires) = ~x+y
@@ -85,5 +83,7 @@ ROI_fires <- cbind(GID_fires@coords, GID_fires@data, xgrid)
 ROI_fires <- na.omit(ROI_fires)
 
 # Export fire locations ---------------------------------------------------
-write.csv(ROI_fires[1:2], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
+write.csv(ROI_fires[1:7], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
+
+
 
