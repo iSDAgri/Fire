@@ -1,4 +1,4 @@
-#' Analyses of ROI-level MODIS-MCD14ML fire data 
+#' Analyses of ROI-level MODIS-MCD14ML fire risk factors 
 #' Example ROI: Tanzania 
 #' Source data courtesy UMD (ftp://fuoco.geog.umd.edu/modis/C5/mcd14ml, login=fire, pwd=burnt)
 #' M. Walsh & J. Chen, May 2015
@@ -75,7 +75,7 @@ GID_fires <- ddply(bbx_fires, .(GID), summarize,
 GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d") ## date of last fire
 GID_fires$DSLF <- as.numeric(difftime(max(GID_fires$maxD), GID_fires$maxD, units="days")) ## number of days since last fire
 
-# Extract gridded covariates at fire locations
+# Extract gridded GeoSurvey predictions at fire locations
 coordinates(GID_fires) = ~x+y
 projection(GID_fires) <- projection(grids)
 xgrid <- extract(grids, GID_fires)
@@ -93,14 +93,18 @@ write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 # GLM's: Days since last fire event per GID (DSLF)
 DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
-DSLF.pred <- predict(DSLF.glm, ROI_fires)
+DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
+DSLF.grid <- predict(grids, DSLF.glm) ## spatial predictions
+quantile(exp(DSLF.grid), probs=c(0.05, 0.5, 0.95))
 
 # Number of fire events on record per GID (N)
 N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(N.glm)
-N.pred <- predict(N.glm, ROI_fires)
+N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
+N.grid <- predict(grids, N.glm) ## spatial predictions
+quantile(exp(N.grid), probs=c(0.05, 0.5, 0.95))
 
