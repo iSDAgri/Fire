@@ -82,16 +82,16 @@ xgrid <- extract(grids, GID_fires)
 ROI_fires <- cbind(GID_fires@coords, GID_fires@data, xgrid)
 ROI_fires <- na.omit(ROI_fires)
 
-# ROI ecdf plot, no. of days since last fire
+# ROI ecdf plots of main variables
 plot(ecdf(ROI_fires$DSLF), main="", xlab="No. days since last fire", ylab="Cum. proportion of observations", xlim=c(0, 5000), verticals=T, lty=1, lwd=1, col="black", do.points=F)
 plot(ecdf(ROI_fires$N), main="", xlab="No. of fires per GID (2000-2015)", ylab="Cum. proportion of observations", xlim=c(0, 6), verticals=T, lty=1, lwd=1, col="black", do.points=F)
 
 # Export fire locations ---------------------------------------------------
 write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 
-# Exploratory models ------------------------------------------------------
+#+ Exploratory models -----------------------------------------------------
 # GLM's: Days since last fire event per GID (DSLF)
-DSLF.glm <- glm(log(DSLF+1)~CRP_ens*RSP_ens*WCP_ens, family=gaussian(link="identity"), data=ROI_fires)
+DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires)
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
