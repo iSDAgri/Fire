@@ -10,6 +10,7 @@ require(rgdal)
 require(maptools)
 require(plyr)
 require(raster)
+require(dismo)
 
 #+ Data downloads ---------------------------------------------------------
 # Create a "Data" folder in your current working directory
@@ -26,9 +27,9 @@ download("https://www.dropbox.com/s/bb5277wvuce0b2h/TZ_bound.zip?dl=0", "./MCD14
 unzip("./MCD14ML/TZ_bound.zip", exdir="./MCD14ML", overwrite=T)
 bound <- readShapeSpatial("./MCD14ML/TZ_bound.shp")
 
-# download ROI grids and stack in raster
-download("https://www.dropbox.com/s/0ucx0oqx8c4lpej/TZ_grids.zip?dl=0", "./MCD14ML/TZ_grids.zip", mode="wb")
-unzip("./MCD14ML/TZ_grids.zip", exdir="./MCD14ML", overwrite=T)
+# download GeoSurvey prediction grids and stack in raster
+download("https://www.dropbox.com/s/e1hsnz7scc3qf9n/TZ_GS_preds.zip?dl=0", "./MCD14ML/TZ_GS_preds.zip", mode="wb")
+unzip("./MCD14ML/TZ_GS_preds.zip", exdir="./MCD14ML", overwrite=T)
 glist <- list.files(path="./MCD14ML", pattern="tif", full.names=T)
 grids <- stack(glist)
 
@@ -70,8 +71,7 @@ GID_fires <- ddply(bbx_fires, .(GID), summarize,
                    x = mean(x),
                    y = mean(y),
                    N = length(GID),
-                   maxD = max(YYYYMMDD),
-                   FRP = mean(FRP))
+                   maxD = max(YYYYMMDD))
 GID_fires$maxD <- strptime(GID_fires$maxD, "%Y%m%d") ## date of last fire
 GID_fires$DSLF <- as.numeric(difftime(max(GID_fires$maxD), GID_fires$maxD, units="days")) ## number of days since last fire
 
@@ -82,8 +82,22 @@ xgrid <- extract(grids, GID_fires)
 ROI_fires <- cbind(GID_fires@coords, GID_fires@data, xgrid)
 ROI_fires <- na.omit(ROI_fires)
 
+# Not run: ROI ecdf plot, no. of days since last fire
+# plot(ecdf(ROI_fires$DSLF), main="", xlab="No. days since last fire", ylab="Cum. proportion of observations", xlim=c(0, 5000), verticals=T, lty=1, lwd=1, col="black", do.points=F)
+
 # Export fire locations ---------------------------------------------------
-write.csv(ROI_fires[1:7], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
+write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 
+# Exploratory models ------------------------------------------------------
+# GLM's: Days since last fire (DSLF)
+DSLF.glm <- glm(log(DSLF+1)~CRP_ens*RSP_ens*WCP_ens, family=gaussian(link="identity"), data=ROI_fires)
+summary(DSLF.glm)
+DSLF.pred <- predict(DSLF.glm, ROI_fires)
+quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
 
+# Number of fires on record per GID (N)
+N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
+summary(DSLF.glm)
+N.pred <- predict(N.glm, ROI_fires)
+quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
 
