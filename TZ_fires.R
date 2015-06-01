@@ -4,7 +4,7 @@
 #' M. Walsh & J. Chen, May 2015
 
 # Required packages
-# install.packages(c("downloader","rgdal","maptools","plyr","raster")), dependencies=TRUE)
+# install.packages(c("downloader","rgdal","maptools","plyr","raster","gstat")), dependencies=TRUE)
 require(downloader)
 require(rgdal)
 require(maptools)
