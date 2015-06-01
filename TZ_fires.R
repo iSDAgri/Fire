@@ -93,7 +93,7 @@ write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 coordinates(ROI_fires) = ~x+y
 projection(ROI_fires) = projection(grids)
 
-# Days since last "high confidence" fire event (DSLF)
+# Number of days since last "high confidence" fire event (DSLF)
 DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
