@@ -100,7 +100,7 @@ DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
 
-# DSLF.glm spatial residuals
+# Variogram of DSLF.glm spatial residuals
 DSLF.var <- variogram(residuals(DSLF.glm) ~ 1, cutoff = 10000, width = 1000, ROI_fires)
 DSLF.vgm <- vgm(model = "Sph", nugget = 700, range = 5000, psill = 900)
 DSLF.fit <- fit.variogram(DSLF.var, model = DSLF.vgm)
@@ -113,7 +113,7 @@ N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
 
-# N.glm spatial residuals
+# Variogram of N.glm spatial residuals
 N.var <- variogram(residuals(N.glm) ~ 1, cutoff = 10000, width = 1000, ROI_fires)
 N.vgm <- vgm(model = "Sph", nugget = 0.4, range = 5000, psill = 0.5)
 N.fit <- fit.variogram(N.var, model = N.vgm)
