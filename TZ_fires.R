@@ -93,7 +93,7 @@ write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 coordinates(ROI_fires) = ~x+y
 projection(ROI_fires) = projection(grids)
 
-# GLM's: Days since last fire event (DSLF)
+# GLM's: Days since last "high confidence" fire event (DSLF)
 DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
@@ -106,7 +106,7 @@ DSLF.vgm <- vgm(model = "Sph", nugget = 700, range = 5000, psill = 900)
 DSLF.fit <- fit.variogram(DSLF.var, model = DSLF.vgm)
 plot(DSLF.var, DSLF.fit, pc = "+", cex = 2)
 
-# Number of fire events on record (N)
+# Number of "high confidence" fire events on record (N)
 N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(N.glm)
 N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
