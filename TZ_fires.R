@@ -4,19 +4,20 @@
 #' M. Walsh & J. Chen, May 2015
 
 # Required packages
-# install.packages(c("downloader","rgdal","maptools","raster")), dependencies=TRUE)
+# install.packages(c("downloader","rgdal","maptools","plyr","raster")), dependencies=TRUE)
 require(downloader)
 require(rgdal)
 require(maptools)
 require(plyr)
 require(raster)
+require(gstat)
 
 #+ Data downloads ---------------------------------------------------------
 # Create a "Data" folder in your current working directory
 dir.create("MCD14ML", showWarnings=F)
 dat_dir <- "./MCD14ML"
 
-# download Africa-wide MCD14ML data (large download: ~490 Mb)
+# download Africa-wide MCD14ML data (note large download: ~490 Mb)
 download("https://www.dropbox.com/s/oi0nvimjawmz7xf/AF_MCD14ML.txt.zip?dl=0", "./MCG14ML/AF_MCD14ML.txt.zip", mode="wb")
 unzip("./MCD14ML/AF_MCD14ML.txt.zip", exdir="./MCD14ML", overwrite=T)
 fires <- read.table(paste(dat_dir, "/AF_MCD14ML.txt", sep=""), header=T)
@@ -95,8 +96,6 @@ summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
-DSLF.grid <- predict(grids, DSLF.glm) ## raster-level predictions
-quantile(exp(DSLF.grid), probs=c(0.05, 0.5, 0.95))
 
 # Number of fire events on record (N)
 N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
@@ -104,6 +103,9 @@ summary(N.glm)
 N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
-N.grid <- predict(grids, N.glm) ## raster-level predictions
-quantile(exp(N.grid), probs=c(0.05, 0.5, 0.95))
+
+
+
+
+
 
