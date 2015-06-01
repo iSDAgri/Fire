@@ -47,7 +47,7 @@ bbx_proj <- as.data.frame(project(cbind(bbx_fires$lon, bbx_fires$lat), "+proj=la
 colnames(bbx_proj) <- c("x","y")
 bbx_fires <- cbind(bbx_fires, bbx_proj)
 
-# Generate AfSIS grid cell ID's (GID) & dates
+# Generate AfSIS grid cell ID's (GID)
 res.pixel <- 1000
 xgid <- ceiling(abs(bbx_fires$x)/res.pixel)
 ygid <- ceiling(abs(bbx_fires$y)/res.pixel)
