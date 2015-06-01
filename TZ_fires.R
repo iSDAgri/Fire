@@ -10,7 +10,6 @@ require(rgdal)
 require(maptools)
 require(plyr)
 require(raster)
-require(dismo)
 
 #+ Data downloads ---------------------------------------------------------
 # Create a "Data" folder in your current working directory
@@ -86,7 +85,7 @@ ROI_fires <- na.omit(ROI_fires)
 plot(ecdf(ROI_fires$DSLF), main="", xlab="No. days since last fire", ylab="Cum. proportion of observations", xlim=c(0, 5000), verticals=T, lty=1, lwd=1, col="black", do.points=F)
 plot(ecdf(ROI_fires$N), main="", xlab="No. of fires per GID (2000-2015)", ylab="Cum. proportion of observations", xlim=c(0, 6), verticals=T, lty=1, lwd=1, col="black", do.points=F)
 
-# Export fire locations ---------------------------------------------------
+# Export fire locations
 write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 
 #+ Exploratory models -----------------------------------------------------
