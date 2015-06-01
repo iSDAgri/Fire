@@ -90,12 +90,21 @@ plot(ecdf(ROI_fires$N), main="", xlab="No. of fires per GID (2000-2015)", ylab="
 write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 
 #+ Exploratory models -----------------------------------------------------
+coordinates(ROI_fires) = ~x+y
+projection(ROI_fires) = projection(grids)
+
 # GLM's: Days since last fire event (DSLF)
 DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
+
+# DSLF.glm spatial residuals
+DSLF.var <- variogram(residuals(DSLF.glm) ~ 1, cutoff = 10000, width = 1000, ROI_fires)
+DSLF.vgm <- vgm(model = "Sph", nugget = 700, range = 5000, psill = 900)
+DSLF.fit <- fit.variogram(DSLF.var, model = DSLF.vgm)
+plot(DSLF.var, DSLF.fit, pc = "+", cex = 2)
 
 # Number of fire events on record (N)
 N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
@@ -104,8 +113,8 @@ N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
 
-
-
-
-
-
+# N.glm spatial residuals
+N.var <- variogram(residuals(N.glm) ~ 1, cutoff = 10000, width = 1000, ROI_fires)
+N.vgm <- vgm(model = "Sph", nugget = 0.4, range = 5000, psill = 0.5)
+N.fit <- fit.variogram(N.var, model = N.vgm)
+plot(N.var, N.fit, pc = "+", cex = 2)
