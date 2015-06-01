@@ -89,21 +89,21 @@ plot(ecdf(ROI_fires$N), main="", xlab="No. of fires per GID (2000-2015)", ylab="
 write.csv(ROI_fires[1:6], "./MCD14ML/TZ_fire_locs.csv", row.names=F)
 
 #+ Exploratory models -----------------------------------------------------
-# GLM's: Days since last fire event per GID (DSLF)
+# GLM's: Days since last fire event (DSLF)
 DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
-DSLF.grid <- predict(grids, DSLF.glm) ## spatial predictions
+DSLF.grid <- predict(grids, DSLF.glm) ## raster-level predictions
 quantile(exp(DSLF.grid), probs=c(0.05, 0.5, 0.95))
 
-# Number of fire events on record per GID (N)
+# Number of fire events on record (N)
 N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(N.glm)
 N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
-N.grid <- predict(grids, N.glm) ## spatial predictions
+N.grid <- predict(grids, N.glm) ## raster-level predictions
 quantile(exp(N.grid), probs=c(0.05, 0.5, 0.95))
 
