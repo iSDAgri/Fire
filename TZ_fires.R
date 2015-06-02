@@ -1,4 +1,4 @@
-#' Analyses of ROI-level MODIS-MCD14ML fire risk factors 
+#' Exploratory analyses of ROI-level MODIS-MCD14ML fire risk factors 
 #' Example ROI: Tanzania 
 #' Source data courtesy UMD (ftp://fuoco.geog.umd.edu/modis/C5/mcd14ml, login=fire, pwd=burnt)
 #' M. Walsh & J. Chen, May 2015
