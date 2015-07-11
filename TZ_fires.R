@@ -94,7 +94,7 @@ coordinates(ROI_fires) = ~x+y
 projection(ROI_fires) = projection(grids)
 
 # Number of days since last "high confidence" fire event (DSLF)
-DSLF.glm <- glm(DSLF+1~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
+DSLF.glm <- glm(DSLF+1~CRP_ens+RSP_ens+WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
@@ -107,7 +107,7 @@ DSLF.fit <- fit.variogram(DSLF.var, model = DSLF.vgm)
 plot(DSLF.var, DSLF.fit, pc = "+", cex = 2)
 
 # Number of "high confidence" fire events on record (N)
-N.glm <- glm(N~CRP_ens*RSP_ens*WCP_ens, family=poisson(link="log"), data=ROI_fires)
+N.glm <- glm(N~CRP_ens+RSP_ens+WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(N.glm)
 N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
