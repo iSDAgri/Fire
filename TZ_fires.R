@@ -98,7 +98,7 @@ projection(ROI_fires) = projection(grids)
 DSLF.glm <- glm(DSLF+1~CRP_ens+RSP_ens+WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
-DSLF.grid <- predict(grids, DSLF.glm)
+DSLF.grid <- predict(grids, DSLF.glm) ## spatial predictions
 plot(exp(DSLF.grid))
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
@@ -113,6 +113,8 @@ plot(DSLF.var, DSLF.fit, pc = "+", cex = 2)
 N.glm <- glm(N~CRP_ens+RSP_ens+WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(N.glm)
 N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
+N.grid <- predict(grids, N.glm) ## spatial predictions
+plot(exp(N.grid))
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
 
