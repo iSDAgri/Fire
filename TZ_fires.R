@@ -1,15 +1,16 @@
-#' Exploratory analyses of ROI-level MODIS-MCD14ML fire propensity factors 
+#' Exploratory analyses of ROI-level MODIS-MCD14ML fire risk factors 
 #' Example ROI: Tanzania 
 #' Source data courtesy UMD (ftp://fuoco.geog.umd.edu/modis/C5/mcd14ml, login=fire, pwd=burnt)
 #' M. Walsh & J. Chen, May 2015
 
 # Required packages
-# install.packages(c("downloader","rgdal","maptools","plyr","raster","gstat")), dependencies=TRUE)
+# install.packages(c("downloader","rgdal","maptools","plyr","raster","caret","gstat")), dependencies=TRUE)
 require(downloader)
 require(rgdal)
 require(maptools)
 require(plyr)
 require(raster)
+require(caret)
 require(gstat)
 
 #+ Data downloads ---------------------------------------------------------
@@ -97,6 +98,8 @@ projection(ROI_fires) = projection(grids)
 DSLF.glm <- glm(DSLF+1~CRP_ens+RSP_ens+WCP_ens, family=poisson(link="log"), data=ROI_fires)
 summary(DSLF.glm)
 DSLF.pred <- predict(DSLF.glm, ROI_fires) ## GID-level predictions
+DSLF.grid <- predict(grids, DSLF.glm)
+plot(exp(DSLF.grid))
 quantile(ROI_fires$DSLF, probs=c(0.05, 0.5, 0.95))
 quantile(exp(DSLF.pred), probs=c(0.05, 0.5, 0.95))
 
