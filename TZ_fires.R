@@ -114,7 +114,7 @@ N.glm <- glm(N~CRP_ens+RSP_ens+WCP_ens, family=poisson(link="log"), data=ROI_fir
 summary(N.glm)
 N.pred <- predict(N.glm, ROI_fires) ## GID-level predictions
 N.grid <- predict(grids, N.glm) ## spatial predictions
-plot(exp(N.grid))
+plot(15.8/(exp(N.grid))) ## plot approximate fire recurrence interval
 quantile(ROI_fires$N, probs=c(0.05, 0.5, 0.95))
 quantile(exp(N.pred), probs=c(0.05, 0.5, 0.95))
 
@@ -123,3 +123,9 @@ N.var <- variogram(residuals(N.glm) ~ 1, cutoff = 10000, width = 1000, ROI_fires
 N.vgm <- vgm(model = "Sph", nugget = 0.4, range = 5000, psill = 0.5)
 N.fit <- fit.variogram(N.var, model = N.vgm)
 plot(N.var, N.fit, pc = "+", cex = 2)
+
+#+ Write spatial predictions -----------------------------------------------
+dir.create("Fire_results", showWarnings=F)
+Fire_pred <- stack(exp(DSLF.grid), 15.8/exp(N.grid))
+writeRaster(Fire_pred, filename="./Fire_results/Fire_pred.tif", datatype="FLT4S", options="INTERLEAVE=BAND", overwrite=T)
+
