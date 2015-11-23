@@ -4,13 +4,12 @@
 #' M. Walsh & J. Chen, May 2015
 
 # Required packages
-# install.packages(c("downloader","rgdal","maptools","plyr","raster","caret","gstat")), dependencies=TRUE)
+# install.packages(c("downloader","rgdal","maptools","plyr","raster","gstat")), dependencies=TRUE)
 require(downloader)
 require(rgdal)
 require(maptools)
 require(plyr)
 require(raster)
-require(caret)
 require(gstat)
 
 #+ Data downloads ---------------------------------------------------------
@@ -128,4 +127,3 @@ plot(N.var, N.fit, pc = "+", cex = 2)
 dir.create("Fire_results", showWarnings=F)
 Fire_pred <- stack(exp(DSLF.grid), 15.8/exp(N.grid))
 writeRaster(Fire_pred, filename="./Fire_results/Fire_pred.tif", datatype="FLT4S", options="INTERLEAVE=BAND", overwrite=T)
-
